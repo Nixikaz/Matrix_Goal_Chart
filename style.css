@@ -1,0 +1,40 @@
+body span {
+  color: white;
+}
+.hidden {
+  display: none;
+}
+.barnode {
+  fill: rgb(70, 131, 180);
+}
+.barnode text {
+  fill: white;
+  text-anchor: middle;
+}
+.barnode:hover text {
+  fill: white;
+  font-size: 16px;
+  text-anchor: middle;
+  opacity : 1;
+  -webkit-transition:opacity 0s;
+  -moz-transition:opacity 0s;
+  -o-transition:opacity 0s;
+  -ms-transition:opacity 0s;
+  transition:opacity 0s;
+}
+.barnode:hover {
+  fill: rgb(35, 221, 254);
+}
+
+.chart1 text {
+  font: 16px sans-serif;
+}
+.goalnode rect {
+  stroke: lime;
+  stroke-width: 1;
+  fill: rgba(150, 150, 150, 0.2)
+}
+.goalnode text {
+  fill: white;
+  text-anchor: middle;
+}
