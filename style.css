@@ -25,7 +25,9 @@ body span {
 .barnode:hover {
   fill: rgb(35, 221, 254);
 }
-
+.tick {
+  color: white;
+}
 .chart1 text {
   font: 16px sans-serif;
 }

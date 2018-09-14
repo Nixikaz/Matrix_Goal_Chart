@@ -28,8 +28,12 @@ deltaData = goalData.map(function(item, index) {
 
 //Set the height of the SVG element, the width of  the SVG element and
 // bars, and the padding between bars
-var svgWidth = 500, svgHeight = 750, barPadding = 5;
-var barWidth = (svgWidth / actualData.length);
+var barPadding = actualData.length;
+    margin = {top:20, right: 20, bottom: 30, left: 50 /*Minimum of 40*/},
+    // Make responsive by getting width from HTML DOM
+    svgWidth = 700 - margin.left - margin.right,
+    svgHeight = 750 - margin.top - margin.bottom;
+var barWidth = ((svgWidth - margin.left) / actualData.length);
 
 // Find the minimum and maximum height for the bars.
 // Only using maxDataPoint currently. un-comment minDataPoint and replace 0
@@ -40,28 +44,40 @@ var barWidth = (svgWidth / actualData.length);
 var maxDataPoint = d3.max(goalData);
 // Scale bars down to range specified.
 var linearScale = d3.scaleLinear()
-                           .domain([0,maxDataPoint])
-                           .range([0,svgHeight - 20]);
+                           .domain([0,maxDataPoint + margin.top])
+                           .range([0,svgHeight - margin.top]);
 
 for (var i = 0; i < actualData.length; i++) {
-  actualScaledData[i] = linearScale(actualData[i]);
-  goalScaledData[i] = linearScale(goalData[i]);
-  deltaScaledData[i] = linearScale(deltaData[i]);
-
+    actualScaledData[i] = linearScale(actualData[i]);
+    goalScaledData[i] = linearScale(goalData[i]);
+    deltaScaledData[i] = linearScale(deltaData[i]);
 }
+
+// Create the axis
+var axisScale = d3.scaleLinear()
+                        .domain([0, maxDataPoint + margin.top])
+                        .range([svgHeight - margin.top,0]);
+var xAxis = d3.axisRight()
+                .scale(axisScale);
+
+
+
 
 // D3 select SVG by class 'chart1' and set height and width
 var svg = d3.select('.chart1')
 .attr("width", svgWidth)
-.attr("height", svgHeight);
-// create <g> container for goal bars to hold rect and text
+.attr("height", svgHeight)
+.append("g")
+.call(xAxis);
+// create <g> container for goal bars to fold rect and text
 var goal = svg.selectAll(".goalnode")
     .data(goalScaledData)
     .enter().append("g")
     .attr("class", "goalnode")
     .attr("transform", function (d, i) {
-        return "translate("+ ((barWidth * i) + 1) + " " + (svgHeight - d) +")";
+        return "translate("+ ((barWidth * i) + 1 + margin.left) + " " + (svgHeight - d - margin.top) +")";
     });
+
 // create <rect> to represent the bars
 goal.append("rect")
     .attr("height", function(d) {
@@ -74,7 +90,7 @@ goal.data(goalData)
     .text(function(d){
         return d;
     })
-    .attr("dx", barWidth / 2)
+    .attr("dx", (barWidth - barPadding) / 2)
     .attr("dy", "-.2em");
 // create <g> container for actual bars to hold rect and text
 var bar = svg.selectAll(".barnode")
@@ -86,9 +102,9 @@ var bar = svg.selectAll(".barnode")
     })
     .attr("transform", function (d, i) {
         if (d > goalScaledData[i]) {
-        return "translate("+ (barWidth * i) + " " + (svgHeight - goalScaledData[i]) +")";
+        return "translate("+ ((barWidth * i) + margin.left) + " " + (svgHeight - goalScaledData[i]) +")";
         } else {
-        return "translate("+ (barWidth * i) + " " + (svgHeight - d) +")";
+        return "translate("+ ((barWidth * i) + margin.left) + " " + (svgHeight - d - margin.top) +")";
         }
     });
 // create <rect> to represent the bars
@@ -116,7 +132,7 @@ bar.data(deltaData)
         return "-" + d;
         }
     })
-    .attr("dx", barWidth / 2)
+    .attr("dx", (barWidth - barPadding) / 2)
     .attr("dy", function(d, i){
         // conditional statement used to position text inside the bar
         // if it gets to a delta of less than 25.
